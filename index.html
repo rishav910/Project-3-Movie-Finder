@@ -40,45 +40,54 @@
 	</div>
 </div>
 	<script type="text/javascript">
-		function search(){
-			movie_name=document.getElementById("input").value;
-			if(movie_name=="")
-				alert("Type a movie name");
-			else{
-				httpRequest = new XMLHttpRequest();
-                url = "https://www.omdbapi.com/?apikey=ddc14cbd&t="+movie_name;
-                httpRequest.open("GET", url);
-                httpRequest.send();
-                httpRequest.onreadystatechange = function(){
-                    if(this.readyState==4 && this.status == 200){
-                        movie_data = JSON.parse(this.responseText);
-                        t = movie_data.Title;
-                        if(t == undefined){
+		function search() {
+            const movieName = document.getElementById("input").value;
+            if (movieName === "") {
+                alert("Type a movie name");
+            } else {
+                /*
+                    encodeURIComponent(movieName) -> Updates it to be used as a query string for URL
+                    Example: How are you? -> How%20are%20you%3F
+                */
+                const url = `https://www.omdbapi.com/?apikey=ddc14cbd&t=${encodeURIComponent(movieName)}`;
+
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(movieData => {
+                        const title = movieData.Title;
+                        if (!title) {
                             alert("No Movie Found");
-                            document.getElementById("input").value= "";
+                            document.getElementById("input").value = "";
                             return;
                         }
-                        document.getElementById("input").value= "";
-                        document.getElementById("title").innerHTML = movie_data.Title;
-                        document.getElementById("movie_poster").style.border="3px solid black";
-                        document.getElementById("movie_poster").src = movie_data.Poster;
-                        document.getElementById("rated").innerHTML = "<b>Rated:</b> "+movie_data.Rated;
-                        document.getElementById("released").innerHTML = "<b>Released On:</b> "+movie_data.Released;
-                        document.getElementById("runtime").innerHTML = "<b>Runtime:</b> "+movie_data.Runtime;
-                        document.getElementById("genre").innerHTML = "<b>Genre:</b> "+movie_data.Genre;
-                        document.getElementById("imdbrating").innerHTML = "<b>IMDB:</b> "+movie_data.imdbRating;
-                        document.getElementById("language").innerHTML = "<b>Language:</b> "+movie_data.Language;
-                        document.getElementById("rt").innerHTML = "<b>Rotten Tomatoes:</b> "+movie_data.Ratings[1].Value;
-                        document.getElementById("director").innerHTML = "<b>Directed By:</b> "+movie_data.Director;
-                        document.getElementById("writer").innerHTML = "<b>Written By:</b> "+movie_data.Writer;
-                        document.getElementById("actors").innerHTML = "<b>Actors:</b> "+movie_data.Actors;
-                        document.getElementById("plot").innerHTML = "<b>Plot:</b> "+movie_data.Plot;
-                        document.getElementById("boxoffice").innerHTML = "<b>Box Office:</b> "+movie_data.BoxOffice;
-                        document.getElementById("production").innerHTML = "<b>Production:</b> "+movie_data.Production;
-                    }
-                }
+                        document.getElementById("input").value = "";
+                        document.getElementById("title").innerHTML = movieData.Title;
+                        document.getElementById("movie_poster").style.border = "3px solid black";
+                        document.getElementById("movie_poster").src = movieData.Poster;
+                        document.getElementById("rated").innerHTML = "<b>Rated:</b> " + movieData.Rated;
+                        document.getElementById("released").innerHTML = "<b>Released On:</b> " + movieData.Released;
+                        document.getElementById("runtime").innerHTML = "<b>Runtime:</b> " + movieData.Runtime;
+                        document.getElementById("genre").innerHTML = "<b>Genre:</b> " + movieData.Genre;
+                        document.getElementById("imdbrating").innerHTML = "<b>IMDB:</b> " + movieData.imdbRating;
+                        document.getElementById("language").innerHTML = "<b>Language:</b> " + movieData.Language;
+                        document.getElementById("rt").innerHTML = "<b>Rotten Tomatoes:</b> " + (movieData.Ratings[1] ? movieData.Ratings[1].Value : "N/A");
+                        document.getElementById("director").innerHTML = "<b>Directed By:</b> " + movieData.Director;
+                        document.getElementById("writer").innerHTML = "<b>Written By:</b> " + movieData.Writer;
+                        document.getElementById("actors").innerHTML = "<b>Actors:</b> " + movieData.Actors;
+                        document.getElementById("plot").innerHTML = "<b>Plot:</b> " + movieData.Plot;
+                        document.getElementById("boxoffice").innerHTML = "<b>Box Office:</b> " + movieData.BoxOffice;
+                        document.getElementById("production").innerHTML = "<b>Production:</b> " + movieData.Production;
+                    })
+                    .catch(error => {
+                        console.error('There has been a problem with your fetch operation:', error);
+                    });
             }
-		}
+        }
 	</script>
 	<footer>
 		This is a Project made by Rishav Saha.
